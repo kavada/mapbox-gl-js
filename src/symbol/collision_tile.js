@@ -66,20 +66,20 @@ class CollisionTile {
 
             const maxInt16 = 32767;
             //left
-            collisionBoxArray.emplaceBack(0, 0, 0, -maxInt16, 0, maxInt16, maxInt16,
-                    0, 0, 0, 0, 0, 0, 0, 0,
+            collisionBoxArray.emplaceBack(0, 0, 0, 0, 0, -maxInt16, 0, maxInt16, maxInt16,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0);
             // right
-            collisionBoxArray.emplaceBack(EXTENT, 0, 0, -maxInt16, 0, maxInt16, maxInt16,
-                    0, 0, 0, 0, 0, 0, 0, 0,
+            collisionBoxArray.emplaceBack(EXTENT, 0, 0, 0, 0, -maxInt16, 0, maxInt16, maxInt16,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0);
             // top
-            collisionBoxArray.emplaceBack(0, 0, -maxInt16, 0, maxInt16, 0, maxInt16,
-                    0, 0, 0, 0, 0, 0, 0, 0,
+            collisionBoxArray.emplaceBack(0, 0, 0, 0, -maxInt16, 0, maxInt16, 0, maxInt16,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0);
             // bottom
-            collisionBoxArray.emplaceBack(0, EXTENT, -maxInt16, 0, maxInt16, 0, maxInt16,
-                    0, 0, 0, 0, 0, 0, 0, 0,
+            collisionBoxArray.emplaceBack(0, EXTENT, 0, 0, -maxInt16, 0, maxInt16, 0, maxInt16,
+                    0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0);
         }
 
@@ -149,6 +149,16 @@ class CollisionTile {
             box.bbox1 = y1;
             box.bbox2 = x2;
             box.bbox3 = y2;
+
+            // When the map is pitched the distance covered by a line changes.
+            // Adjust the max scale by (approximatePitchedLength / approximateRegularLength)
+            // to compensate for this.
+            const yStretch2 = yStretch;
+            const xSqr = box.offsetX * box.offsetX;
+            const ySqr = box.offsetY * box.offsetY;
+            const yStretchSqr = ySqr * yStretch2 * yStretch2;
+            const adjustmentFactor = Math.sqrt((xSqr + yStretchSqr) / (xSqr + ySqr)) || 1;
+            box.maxScale = box.unadjustedMaxScale * adjustmentFactor;
 
             if (!allowOverlap) {
                 const blockingBoxes = this.grid.query(x1, y1, x2, y2);

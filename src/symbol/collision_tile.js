@@ -153,10 +153,11 @@ class CollisionTile {
             // When the map is pitched the distance covered by a line changes.
             // Adjust the max scale by (approximatePitchedLength / approximateRegularLength)
             // to compensate for this.
-            const yStretch2 = yStretch;
-            const xSqr = box.offsetX * box.offsetX;
-            const ySqr = box.offsetY * box.offsetY;
-            const yStretchSqr = ySqr * yStretch2 * yStretch2;
+
+            const offset = new Point(box.offsetX, box.offsetY)._matMult(rotationMatrix);
+            const xSqr = offset.x * offset.x;
+            const ySqr = offset.y * offset.y;
+            const yStretchSqr = ySqr * yStretch * yStretch;
             const adjustmentFactor = Math.sqrt((xSqr + yStretchSqr) / (xSqr + ySqr)) || 1;
             box.maxScale = box.unadjustedMaxScale * adjustmentFactor;
 
